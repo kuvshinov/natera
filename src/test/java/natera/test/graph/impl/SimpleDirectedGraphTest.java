@@ -129,7 +129,7 @@ public class SimpleDirectedGraphTest {
     }
 
     @Test
-    public void shouldAddVertexAndEdgeConcurrently() {
+    public void shouldAddVertexAndEdgeConcurrently() throws BrokenBarrierException, InterruptedException {
         final int amountOfEdges = 1000;
         final int amountOfThreads = 10;
         AtomicInteger edgeCounter = new AtomicInteger();
@@ -142,7 +142,7 @@ public class SimpleDirectedGraphTest {
             assertTrue(result.containsAll(IntStream.range(1, amountOfEdges + 1).boxed().collect(Collectors.toList())));
         };
 
-        CyclicBarrier barrier = new CyclicBarrier(amountOfThreads, assertion);
+        CyclicBarrier barrier = new CyclicBarrier(amountOfThreads + 1, assertion);
 
         Runnable scenario = () -> {
             for(int i = 1; i <= amountOfEdges; i++) {
@@ -163,6 +163,7 @@ public class SimpleDirectedGraphTest {
         for (int i = 0; i < amountOfThreads; i++) {
             new Thread(scenario).start();
         }
+        barrier.await();
     }
 
 }
